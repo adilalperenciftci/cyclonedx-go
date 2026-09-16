@@ -61,6 +61,16 @@ func TestJSFSignatureJSONInlineRoundTrip(t *testing.T) {
 	require.JSONEq(t, string(input), string(encoded))
 }
 
+func TestJSFSignerJSONIncludesRequiredEmptyValues(t *testing.T) {
+	encoded, err := json.Marshal(JSFSigner{})
+	require.NoError(t, err)
+	require.JSONEq(t, `{"algorithm":"","value":""}`, string(encoded))
+
+	encoded, err = json.Marshal(JSFSignature{JSFSigner: &JSFSigner{}})
+	require.NoError(t, err)
+	require.JSONEq(t, `{"algorithm":"","value":""}`, string(encoded))
+}
+
 func TestJSFSignatureJSONMultipleSigners(t *testing.T) {
 	input := []byte(`{"signers":[{"algorithm":"ES256","value":"first"},{"algorithm":"RS512","value":"second"}]}`)
 

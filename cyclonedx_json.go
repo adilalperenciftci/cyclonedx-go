@@ -34,8 +34,28 @@ type jsfSignatureJSON struct {
 	Chain           *[]JSFSigner  `json:"chain,omitempty"`
 }
 
+type jsfSignerJSON struct {
+	Algorithm       string        `json:"algorithm"`
+	KeyID           string        `json:"keyId,omitempty"`
+	PublicKey       *JSFPublicKey `json:"publicKey,omitempty"`
+	CertificatePath *[]string     `json:"certificatePath,omitempty"`
+	Excludes        *[]string     `json:"excludes,omitempty"`
+	Value           string        `json:"value"`
+}
+
+type jsfSignatureMarshalJSON struct {
+	Algorithm       *string       `json:"algorithm,omitempty"`
+	KeyID           string        `json:"keyId,omitempty"`
+	PublicKey       *JSFPublicKey `json:"publicKey,omitempty"`
+	CertificatePath *[]string     `json:"certificatePath,omitempty"`
+	Excludes        *[]string     `json:"excludes,omitempty"`
+	Value           *string       `json:"value,omitempty"`
+	Signers         *[]JSFSigner  `json:"signers,omitempty"`
+	Chain           *[]JSFSigner  `json:"chain,omitempty"`
+}
+
 func (signer JSFSigner) MarshalJSON() ([]byte, error) {
-	encoded := jsfSignatureJSON{
+	encoded := jsfSignerJSON{
 		Algorithm:       signer.Algorithm,
 		KeyID:           signer.KeyID,
 		CertificatePath: signer.CertificatePath,
@@ -50,16 +70,16 @@ func (signer JSFSigner) MarshalJSON() ([]byte, error) {
 }
 
 func (signature JSFSignature) MarshalJSON() ([]byte, error) {
-	encoded := jsfSignatureJSON{
+	encoded := jsfSignatureMarshalJSON{
 		Signers: signature.Signers,
 		Chain:   signature.Chain,
 	}
-	if signature.JSFSigner != nil {
-		encoded.Algorithm = signature.Algorithm
+	if signature.JSFSigner != nil && signature.Signers == nil && signature.Chain == nil {
+		encoded.Algorithm = &signature.Algorithm
 		encoded.KeyID = signature.KeyID
 		encoded.CertificatePath = signature.CertificatePath
 		encoded.Excludes = signature.Excludes
-		encoded.Value = signature.Value
+		encoded.Value = &signature.Value
 		if signature.PublicKey != (JSFPublicKey{}) {
 			encoded.PublicKey = &signature.PublicKey
 		}
